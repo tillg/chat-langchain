@@ -28,11 +28,8 @@ import { Source } from "./SourceBubble";
 import { apiBaseUrl } from "../utils/constants";
 
 const MODEL_TYPES = [
-  "openai_gpt_3_5_turbo",
-  "anthropic_claude_3_sonnet",
-  "google_gemini_pro",
-  "fireworks_mixtral",
-  "cohere_command",
+  "mixtral:8x7b-instruct-v0.1-q8_0",
+  "llama3:70b-instruct",
 ];
 
 const defaultLlmValue =
@@ -220,29 +217,11 @@ export function ChatWindow(props: { conversationId: string }) {
           mb={1}
           color={"white"}
         >
-          Chat LangChain 🦜🔗
+          Chat Till 👕
         </Heading>
-        {messages.length > 0 ? (
-          <Heading fontSize="md" fontWeight={"normal"} mb={1} color={"white"}>
-            We appreciate feedback!
-          </Heading>
-        ) : (
-          <Heading
-            fontSize="xl"
-            fontWeight={"normal"}
-            color={"white"}
-            marginTop={"10px"}
-            textAlign={"center"}
-          >
-            Ask me anything about LangChain&apos;s{" "}
-            <Link href="https://python.langchain.com/" color={"blue.200"}>
-              Python documentation!
-            </Link>
-          </Heading>
-        )}
         <div className="text-white flex flex-wrap items-center mt-4">
           <div className="flex items-center mb-2">
-            <span className="shrink-0 mr-2">Powered by</span>
+            <span className="shrink-0 mr-2">Powered by </span>
             {llmIsLoading ? (
               <Spinner className="my-2"></Spinner>
             ) : (
@@ -254,13 +233,11 @@ export function ChatWindow(props: { conversationId: string }) {
                 }}
                 width={"240px"}
               >
-                <option value="openai_gpt_3_5_turbo">GPT-3.5-Turbo</option>
-                <option value="anthropic_claude_3_sonnet">Claude 3 Sonnet</option>
-                <option value="google_gemini_pro">Google Gemini Pro</option>
-                <option value="fireworks_mixtral">
-                  Mixtral (via Fireworks.ai)
-                </option>
-                <option value="cohere_command">Cohere</option>
+                  {MODEL_TYPES.map((modelType) => (
+                    <option key={modelType} value={modelType}>
+                      {modelType}
+                    </option>
+                  ))}
               </Select>
             )}
           </div>
