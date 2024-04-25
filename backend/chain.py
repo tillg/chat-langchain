@@ -27,7 +27,7 @@ from langchain_core.runnables import (
 )
 from langchain_community.llms import Ollama
 
-from constants import COLLECTION_NAME, LLM_MODEL
+from constants import  LLM_MODEL, OLLAMA_BASE_URL
 
 RESPONSE_TEMPLATE = """\
 You are an expert programmer and problem-solver, tasked with answering any question \
@@ -243,7 +243,7 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
 #     [gpt_3_5, claude_3_sonnet, fireworks_mixtral, gemini_pro, cohere_command]
 # )
 
-llm = Ollama(model=LLM_MODEL)
+llm = Ollama(model=LLM_MODEL, base_url=OLLAMA_BASE_URL)
 
 retriever = get_retriever()
 answer_chain = create_chain(llm, retriever)

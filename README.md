@@ -20,10 +20,12 @@ From there I modified it (and plan to modify it) in the following ways:
 * Server component offers different _brainz_, i.e. sites that have been scraped and ingested
 
 ## Running locally
+
 1. Create a local Python environment: `python3.12 -m venv .venv`
 2. Activate it with `source .venv/bin/activate`
 3. Install backend dependencies: `pip install -r requirements.txt`.
 4. Makle sure Ollama is running and has the provided models pulled. You can check it with `ollama list`.
+4. Configure your constants in `backend/constants.py`
 5. Run `python backend/ingest.py` to ingest LangChain docs data into the Chroma vectorstore (only needs to be done once).
 6. Start the Python backend with `python backend/main.py`.
 7. Install frontend dependencies by running `cd ./frontend`, then `yarn`.

@@ -217,7 +217,9 @@ export function ChatWindow(props: { conversationId: string }) {
           mb={1}
           color={"white"}
         >
-          Chat Till 👕
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            Smart Chat <img src="/images/memoji.png" alt="Memoji" style={{ width: '60px', height: '60px', marginLeft: '10px' }} />
+          </div>
         </Heading>
         <div className="text-white flex flex-wrap items-center mt-4">
           <div className="flex items-center mb-2">
@@ -300,7 +302,7 @@ export function ChatWindow(props: { conversationId: string }) {
       {messages.length === 0 ? (
         <footer className="flex justify-center absolute bottom-8">
           <a
-            href="https://github.com/langchain-ai/chat-langchain"
+            href="https://github.com/tillg/chat-langchain"
             target="_blank"
             className="text-white flex items-center"
           >

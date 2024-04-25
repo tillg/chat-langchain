@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
 #from langsmith import Client
 from pydantic import BaseModel
-
+import ollamaWrapper
 #client = Client()
 
 app = FastAPI()
@@ -108,6 +108,10 @@ async def get_trace(body: GetTraceBody):
         }
     # return await aget_trace_url(str(run_id))
 
+@app.get("/models")
+async def get_models():
+    models = ollamaWrapper.get_models()
+    return {"models": models}
 
 if __name__ == "__main__":
     import uvicorn
