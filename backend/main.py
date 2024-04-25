@@ -1,5 +1,6 @@
 """Main entrypoint for the app."""
 import asyncio
+import logging
 from typing import Optional, Union
 from uuid import UUID
 
@@ -12,6 +13,9 @@ from langserve import add_routes
 from pydantic import BaseModel
 import ollamaWrapper
 #client = Client()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.add_middleware(
@@ -110,6 +114,8 @@ async def get_trace(body: GetTraceBody):
 
 @app.get("/models")
 async def get_models():
+    logger = logging.getLogger(__name__)
+    logger.info("Getting models")
     models = ollamaWrapper.get_models()
     return {"models": models}
 

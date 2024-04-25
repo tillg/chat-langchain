@@ -27,13 +27,13 @@ import { Select, Link } from "@chakra-ui/react";
 import { Source } from "./SourceBubble";
 import { apiBaseUrl } from "../utils/constants";
 
-const MODEL_TYPES = [
-  "mixtral:8x7b-instruct-v0.1-q8_0",
-  "llama3:70b-instruct",
-];
+// const MODEL_TYPES = [
+//   "mixtral:8x7b-instruct-v0.1-q8_0",
+//   "llama3:70b-instruct",
+// ];
 
-const defaultLlmValue =
-  MODEL_TYPES[Math.floor(Math.random() * MODEL_TYPES.length)];
+// const defaultLlmValue =
+//   MODEL_TYPES[Math.floor(Math.random() * MODEL_TYPES.length)];
 
 export function ChatWindow(props: { conversationId: string }) {
   const conversationId = props.conversationId;
@@ -44,15 +44,41 @@ export function ChatWindow(props: { conversationId: string }) {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [models, setModels] = useState<string[]>([]);
   const [llm, setLlm] = useState(
     searchParams.get("llm") ?? "openai_gpt_3_5_turbo",
   );
   const [llmIsLoading, setLlmIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   setLlm(searchParams.get("llm") ?? defaultLlmValue);
+  //   setLlmIsLoading(false);
+  // }, []);
+
+
   useEffect(() => {
-    setLlm(searchParams.get("llm") ?? defaultLlmValue);
+    const fetchModels = async () => {
+      const url = `${apiBaseUrl}/models`;
+      console.log('Fetching models from:', url);
+      try {
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        if (data.models && Array.isArray(data.models)) {
+          const modelNames = data.models.map(model => model.name);
+          setModels(modelNames);
+          setLlm(modelNames[0]);
+        } else {
+          console.error('Expected an array of models but received:', data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch models:', error);
+      }
+    };
+    fetchModels();
     setLlmIsLoading(false);
   }, []);
-
+ 
   const [chatHistory, setChatHistory] = useState<
     { human: string; ai: string }[]
   >([]);
@@ -235,9 +261,9 @@ export function ChatWindow(props: { conversationId: string }) {
                 }}
                 width={"240px"}
               >
-                  {MODEL_TYPES.map((modelType) => (
-                    <option key={modelType} value={modelType}>
-                      {modelType}
+                  {models.map((model) => (
+                    <option key={model} value={model}>
+                      {model}
                     </option>
                   ))}
               </Select>
