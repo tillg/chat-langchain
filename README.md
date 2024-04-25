@@ -14,10 +14,13 @@ From there I modified it (and plan to modify it) in the following ways:
 
 ## Todo / backlog
 
-* Move from poetry to `requirements file` - as poetry is too complex for a hobby programmer like me. Maybe that's already done, but I have to test it... ❓
 * Find out ifthe `_scripts` directory is needed.
 * Server component should list the available models so client offers option to choose
 * Server component offers different _brainz_, i.e. sites that have been scraped and ingested
+
+## Done
+* 2024-04-24 Move from poetry to `requirements file` - as poetry is too complex for a hobby programmer like me.
+* 2024-04-22 Simplify the original project and get it running fully locally
 
 ## Running locally
 

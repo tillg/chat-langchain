@@ -12,6 +12,7 @@ from langchain.utils.html import PREFIXES_TO_IGNORE_REGEX, SUFFIXES_TO_IGNORE_RE
 from langchain_community.vectorstores import Chroma
 from langchain_core.embeddings import Embeddings
 from langchain_community.embeddings import OllamaEmbeddings
+from chromadb.config import Settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,10 +25,14 @@ def get_embeddings_model():
 
 def get_vectorestore():
     embedding = get_embeddings_model()
+
+
     return Chroma(
         collection_name=COLLECTION_NAME,
         embedding_function=embedding,
         persist_directory=VECTORESTORE_DIRECTORY,
+        client_settings=Settings(
+            anonymized_telemetry=False, is_persistent=True, )
     )
 
 def metadata_extractor(meta: dict, soup: BeautifulSoup) -> dict:
@@ -150,7 +155,7 @@ def ingest_docs():
     logger.info(f"Indexing stats: {indexing_stats}")
     num_vecs = len(vectorstore.get())
     logger.info(
-        f"LangChain now has this many vectors: {num_vecs}",
+        f"The vectorestore now has this many vectors: {num_vecs}",
     )
 
 
