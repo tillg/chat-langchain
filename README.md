@@ -1,4 +1,4 @@
-# Chat LangChain - Till's version
+# smart chat 
 
 This is Till's version of the [Chat Langchain](https://github.com/langchain-ai/chat-langchain).
 
