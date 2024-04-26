@@ -19,6 +19,7 @@ From there I modified it (and plan to modify it) in the following ways:
 * Server component offers different _brainz_, i.e. sites that have been scraped and ingested
 
 ## Done
+* 2024-04-25 Renamed Github Repo
 * 2024-04-24 Move from poetry to `requirements file` - as poetry is too complex for a hobby programmer like me.
 * 2024-04-22 Simplify the original project and get it running fully locally
 
