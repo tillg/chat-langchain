@@ -2,7 +2,7 @@
 import logging
 import os
 import re
-from parser import langchain_docs_extractor
+from parser import langchain_docs_extractor # type: ignore
 
 from bs4 import BeautifulSoup, SoupStrainer
 from langchain_community.document_loaders import RecursiveUrlLoader, SitemapLoader
@@ -130,7 +130,7 @@ def ingest_docs():
     # logger.info(f"Loaded {len(docs_from_langsmith)} docs from Langsmith")
 
     docs_transformed = text_splitter.split_documents(
-        docs_from_documentation # + docs_from_api + docs_from_langsmith
+        docs_from_documentation  #+ docs_from_api + docs_from_langsmith
     )
     docs_transformed = [doc for doc in docs_transformed if len(doc.page_content) > 10]
 
@@ -143,6 +143,7 @@ def ingest_docs():
         if "title" not in doc.metadata:
             doc.metadata["title"] = ""
 
+    logger.info(f"Indexing documents..")
     indexing_stats = index(
         docs_transformed,
         record_manager,
@@ -152,7 +153,7 @@ def ingest_docs():
         force_update=True,
     )
 
-    logger.info(f"Indexing stats: {indexing_stats}")
+    logger.info(f"Indexing Done. Stats: {indexing_stats}")
     num_vecs = len(vectorstore.get())
     logger.info(
         f"The vectorestore now has this many vectors: {num_vecs}",

@@ -26,6 +26,9 @@ from langchain_core.runnables import (
     chain,
 )
 from langchain_community.llms import Ollama
+from handlerToDocumentLog import HandlerToDocumentLog
+from langchain.callbacks.tracers import ConsoleCallbackHandler
+from langsmith import Client
 
 from constants import  LLM_MODEL, OLLAMA_BASE_URL
 
@@ -98,7 +101,7 @@ Follow Up Input: {question}
 Standalone Question:"""
 
 
-#client = Client()
+client = Client()
 
 app = FastAPI()
 app.add_middleware(
@@ -141,7 +144,7 @@ def create_retriever_chain(
             )
             | retriever
         ).with_config(run_name="RetrievalChainWithNoHistory"),
-    ).with_config(run_name="RouteDependingOnChatHistory")
+    ).with_config(run_name="RouteDependingOnChatHistory", callbacks=[HandlerToDocumentLog(), ConsoleCallbackHandler()])
 
 
 def format_docs(docs: Sequence[Document]) -> str:
@@ -243,7 +246,9 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
 #     [gpt_3_5, claude_3_sonnet, fireworks_mixtral, gemini_pro, cohere_command]
 # )
 
-llm = Ollama(model=LLM_MODEL, base_url=OLLAMA_BASE_URL)
+# Timeout 5 minutes in milliseconds
+timeout = 1000*  60 * 5
+llm = Ollama(model=LLM_MODEL, base_url=OLLAMA_BASE_URL, timeout=timeout)
 
 retriever = get_retriever()
 answer_chain = create_chain(llm, retriever)

@@ -27,14 +27,6 @@ import { Select, Link } from "@chakra-ui/react";
 import { Source } from "./SourceBubble";
 import { apiBaseUrl } from "../utils/constants";
 
-// const MODEL_TYPES = [
-//   "mixtral:8x7b-instruct-v0.1-q8_0",
-//   "llama3:70b-instruct",
-// ];
-
-// const defaultLlmValue =
-//   MODEL_TYPES[Math.floor(Math.random() * MODEL_TYPES.length)];
-
 export function ChatWindow(props: { conversationId: string }) {
   const conversationId = props.conversationId;
 
@@ -131,7 +123,7 @@ export function ChatWindow(props: { conversationId: string }) {
       const remoteChain = new RemoteRunnable({
         url: apiBaseUrl + "/chat",
         options: {
-          timeout: 60000,
+          timeout: 600000,
         },
       });
       const llmDisplayName = llm ?? "openai_gpt_3_5_turbo";

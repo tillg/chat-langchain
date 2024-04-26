@@ -9,10 +9,18 @@ from chain import ChatRequest, answer_chain
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
-#from langsmith import Client
+from langsmith import Client
 from pydantic import BaseModel
 import ollamaWrapper
-#client = Client()
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+api_key= os.environ.get("LANGCHAIN_API_KEY")
+print("API KEY: ",api_key)
+client = Client(api_key=api_key)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,16 +54,16 @@ class SendFeedbackBody(BaseModel):
     comment: Optional[str] = None
 
 
-# @app.post("/feedback")
-# async def send_feedback(body: SendFeedbackBody):
-#     client.create_feedback(
-#         body.run_id,
-#         body.key,
-#         score=body.score,
-#         comment=body.comment,
-#         feedback_id=body.feedback_id,
-#     )
-#     return {"result": "posted feedback successfully", "code": 200}
+@app.post("/feedback")
+async def send_feedback(body: SendFeedbackBody):
+    client.create_feedback(
+        body.run_id,
+        body.key,
+        score=body.score,
+        comment=body.comment,
+        feedback_id=body.feedback_id,
+    )
+    return {"result": "posted feedback successfully", "code": 200}
 
 
 class UpdateFeedbackBody(BaseModel):
@@ -72,11 +80,11 @@ async def update_feedback(body: UpdateFeedbackBody):
             "result": "No feedback ID provided",
             "code": 400,
         }
-    # client.update_feedback(
-    #     feedback_id,
-    #     score=body.score,
-    #     comment=body.comment,
-    # )
+    client.update_feedback(
+        feedback_id,
+        score=body.score,
+        comment=body.comment,
+    )
     return {"result": "patched feedback successfully", "code": 200}
 
 
@@ -85,17 +93,17 @@ async def _arun(func, *args, **kwargs):
     return await asyncio.get_running_loop().run_in_executor(None, func, *args, **kwargs)
 
 
-# async def aget_trace_url(run_id: str) -> str:
-#     for i in range(5):
-#         try:
-#             await _arun(client.read_run, run_id)
-#             break
-#         except langsmith.utils.LangSmithError:
-#             await asyncio.sleep(1**i)
+async def aget_trace_url(run_id: str) -> str:
+    for i in range(5):
+        try:
+            await _arun(client.read_run, run_id)
+            break
+        except langsmith.utils.LangSmithError:
+            await asyncio.sleep(1**i)
 
-#     if await _arun(client.run_is_shared, run_id):
-#         return await _arun(client.read_run_shared_link, run_id)
-#     return await _arun(client.share_run, run_id)
+    if await _arun(client.run_is_shared, run_id):
+        return await _arun(client.read_run_shared_link, run_id)
+    return await _arun(client.share_run, run_id)
 
 
 class GetTraceBody(BaseModel):
@@ -110,7 +118,7 @@ async def get_trace(body: GetTraceBody):
             "result": "No LangSmith run ID provided",
             "code": 400,
         }
-    # return await aget_trace_url(str(run_id))
+    return await aget_trace_url(str(run_id))
 
 @app.get("/models")
 async def get_models():
