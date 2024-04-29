@@ -144,7 +144,7 @@ def create_retriever_chain(
             )
             | retriever
         ).with_config(run_name="RetrievalChainWithNoHistory"),
-    ).with_config(run_name="RouteDependingOnChatHistory", callbacks=[HandlerToDocumentLog(), ConsoleCallbackHandler()])
+    ).with_config(run_name="RouteDependingOnChatHistory")
 
 
 def format_docs(docs: Sequence[Document]) -> str:
@@ -187,7 +187,8 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
         ]
     )
 
-    default_response_synthesizer = prompt | llm
+    default_response_synthesizer = prompt | llm.with_config(
+        callbacks=[HandlerToDocumentLog()])
 
 
     # response_synthesizer = (
@@ -205,6 +206,7 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
         RunnablePassthrough.assign(chat_history=serialize_history)
         | context
         | default_response_synthesizer
+        | StrOutputParser()
     )
 
 

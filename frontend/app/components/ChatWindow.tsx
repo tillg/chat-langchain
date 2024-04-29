@@ -57,7 +57,7 @@ export function ChatWindow(props: { conversationId: string }) {
         console.log('Response status:', response.status);
         const data = await response.json();
         if (data.models && Array.isArray(data.models)) {
-          const modelNames = data.models.map(model => model.name);
+          const modelNames: string[] = data.models.map((model: { name: string }) => model.name);
           setModels(modelNames);
           setLlm(modelNames[0]);
         } else {
@@ -75,7 +75,7 @@ export function ChatWindow(props: { conversationId: string }) {
     { human: string; ai: string }[]
   >([]);
 
-  const sendMessage = async (message?: string) => {
+  const sendMessage = async (message?: string) => { 
     if (messageContainerRef.current) {
       messageContainerRef.current.classList.add("grow");
     }

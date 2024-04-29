@@ -31,9 +31,14 @@ def robust_jsonify(obj, *args, **kwargs):
                     f"Failed to get dictionary representation of {o}")
 
                 # If that fails, convert the object to a string
-                str = str(o)
-                #logger.info(f"Returning string {str}")
-                return str
+                try:
+                    str = str(o)
+                    #logger.info(f"Returning string {str}")
+                    return str
+                except:
+                    logger.warning(f"Failed to convert {o} to string")
+                    # If that fails, return the repr of the object
+                    return repr(o)
 
         def encode(self, obj):
             logger = logging.getLogger(__name__)
