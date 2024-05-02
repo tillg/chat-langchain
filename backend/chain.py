@@ -2,7 +2,7 @@ import os
 from operator import itemgetter
 from typing import Dict, List, Optional, Sequence
 
-from ingest import get_vectorestore
+from backend.ingest import get_vectorestore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.documents import Document
@@ -26,11 +26,13 @@ from langchain_core.runnables import (
     chain,
 )
 from langchain_community.llms import Ollama
-from handlerToDocumentLog import HandlerToDocumentLog
+from backend.ollamaWrapper import get_models
+from backend.handlerToDocumentLog import HandlerToDocumentLog
 from langchain.callbacks.tracers import ConsoleCallbackHandler
 from langsmith import Client
 
-from constants import  LLM_MODEL, OLLAMA_BASE_URL
+from backend.constants import  LLM_MODEL, OLLAMA_BASE_URL, DEFAULT_MODEL
+import logging
 
 RESPONSE_TEMPLATE = """\
 You are an expert programmer and problem-solver, tasked with answering any question \
@@ -100,18 +102,10 @@ Chat History:
 Follow Up Input: {question}
 Standalone Question:"""
 
+logging.basicConfig(level=logging.INFO)
+
 
 client = Client()
-
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 
 class ChatRequest(BaseModel):
     question: str
@@ -249,8 +243,28 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
 # )
 
 # Timeout 5 minutes in milliseconds
-timeout = 1000*  60 * 5
-llm = Ollama(model=LLM_MODEL, base_url=OLLAMA_BASE_URL, timeout=timeout)
 
-retriever = get_retriever()
-answer_chain = create_chain(llm, retriever)
+def chat(*, question: str, llm_model : str = DEFAULT_MODEL, chat_history=None ):
+
+    logger = logging.getLogger(__name__)
+    available_models = get_models()
+    if available_models is None:
+        logger.error("No LLM models available")
+        raise Exception("No models available")
+    if llm_model not in available_models:
+        logger.warn(f"Model {llm_model} not available, switching to default model {DEFAULT_MODEL}")
+        llm_model = DEFAULT_MODEL
+        if llm_model not in available_models:
+            logger.error(f"Default model {DEFAULT_MODEL} not in available models {available_models}!")
+            return None
+    
+    timeout = 1000 * 60 * 5
+    llm = Ollama(model=llm_model, base_url=OLLAMA_BASE_URL, timeout=timeout)
+
+    retriever = get_retriever()
+
+    answer_chain = create_chain(llm, retriever)
+
+    answer = answer_chain.invoke(
+        {"chat_history": None, "question": question})
+    return answer

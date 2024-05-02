@@ -2,8 +2,8 @@ import json
 import logging
 import os
 from typing import Dict, Optional
-from utils.robust_jsonify import robust_jsonify
-from utils.utils import  get_now_as_string
+from backend.utils.robust_jsonify import robust_jsonify
+from backend.utils.utils import  get_now_as_string
 logger = logging.getLogger(__name__)
 
 def write_dict_to_file(*, dictionary: Dict, full_filename: str) -> Dict:

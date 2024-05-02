@@ -2,7 +2,7 @@
 import logging
 import os
 import re
-from parser import langchain_docs_extractor # type: ignore
+from backend.parser import langchain_docs_extractor # type: ignore
 
 from bs4 import BeautifulSoup, SoupStrainer
 from langchain_community.document_loaders import RecursiveUrlLoader, SitemapLoader
@@ -17,7 +17,7 @@ from chromadb.config import Settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from constants import  EMBEDDING_MODEL, COLLECTION_NAME , VECTORESTORE_DIRECTORY 
+from backend.constants import  EMBEDDING_MODEL, COLLECTION_NAME , VECTORESTORE_DIRECTORY 
 
 def get_embeddings_model():
     return OllamaEmbeddings(model=EMBEDDING_MODEL)

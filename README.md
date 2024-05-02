@@ -12,6 +12,18 @@ From there I modified it (and plan to modify it) in the following ways:
 * Offering different sources: Another website (maybe a manual of another software), a Wiki space...
 * Providing functionality to evaluate performance, i.e. if the answers are close to what we expect.
 
+
+## Dev Setup & Running
+
+I use a couple of windows with a standard command (this all assumes you are in the project folder):
+
+```bash
+# Follow the Ollama log
+less +F ~/.ollama/logs/server.log
+
+# Run the server: Go into the project (root) directory
+python main.py
+```
 ## Todo / backlog
 
 * Find out ifthe `_scripts` directory is needed.
@@ -19,6 +31,9 @@ From there I modified it (and plan to modify it) in the following ways:
 * Server component offers different _brainz_, i.e. sites that have been scraped and ingested
 
 ## Done
+
+* 2024-04-29 Decision is taken to rework the backend API. Think API first!
+* 2024-04-28 Added logging
 * 2024-04-25 Renamed Github Repo
 * 2024-04-24 Move from poetry to `requirements file` - as poetry is too complex for a hobby programmer like me.
 * 2024-04-22 Simplify the original project and get it running fully locally

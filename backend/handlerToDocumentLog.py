@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 from langchain_core.callbacks import BaseCallbackHandler
-from utils.dict2file import write_dict_to_file
-from utils.utils import get_now_as_string
+from backend.utils.dict2file import write_dict_to_file
+from backend.utils.utils import get_now_as_string
 import os
 LOG_DIR = 'data/logs'
 
