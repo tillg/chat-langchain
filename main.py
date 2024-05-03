@@ -4,7 +4,6 @@ from typing import List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from langsmith import Client
 from backend import ollamaWrapper
 import os
 from dotenv import load_dotenv
@@ -18,7 +17,6 @@ load_dotenv()
 
 api_key = os.environ.get("LANGCHAIN_API_KEY")
 print("API KEY: ", api_key)
-client = Client(api_key=api_key)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,7 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-
 
 @app.post("/chat/{model}")
 def chat(model: str, chat_history: List[Message] | None, question: str):

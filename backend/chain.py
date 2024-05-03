@@ -29,10 +29,10 @@ from langchain_community.llms import Ollama
 from backend.ollamaWrapper import get_models
 from backend.handlerToDocumentLog import HandlerToDocumentLog
 from langchain.callbacks.tracers import ConsoleCallbackHandler
-from langsmith import Client
 
-from backend.constants import  LLM_MODEL, OLLAMA_BASE_URL, DEFAULT_MODEL
+from backend.constants import LLM_MODEL, OLLAMA_BASE_URL, DEFAULT_MODEL
 import logging
+from langfuse.callback import CallbackHandler
 
 RESPONSE_TEMPLATE = """\
 You are an expert programmer and problem-solver, tasked with answering any question \
@@ -105,8 +105,6 @@ Standalone Question:"""
 logging.basicConfig(level=logging.INFO)
 
 
-client = Client()
-
 class ChatRequest(BaseModel):
     question: str
     chat_history: Optional[List[Dict[str, str]]]
@@ -114,6 +112,7 @@ class ChatRequest(BaseModel):
 
 def get_retriever() -> BaseRetriever:
     return get_vectorestore().as_retriever(search_kwargs=dict(k=6))
+
 
 def create_retriever_chain(
     llm: LanguageModelLike, retriever: BaseRetriever
@@ -130,7 +129,8 @@ def create_retriever_chain(
             RunnableLambda(lambda x: bool(x.get("chat_history"))).with_config(
                 run_name="HasChatHistoryCheck"
             ),
-            conversation_chain.with_config(run_name="RetrievalChainWithHistory"),
+            conversation_chain.with_config(
+                run_name="RetrievalChainWithHistory"),
         ),
         (
             RunnableLambda(itemgetter("question")).with_config(
@@ -154,7 +154,8 @@ def serialize_history(request: ChatRequest):
     converted_chat_history = []
     for message in chat_history:
         if message.get("human") is not None:
-            converted_chat_history.append(HumanMessage(content=message["human"]))
+            converted_chat_history.append(
+                HumanMessage(content=message["human"]))
         if message.get("ai") is not None:
             converted_chat_history.append(AIMessage(content=message["ai"]))
     return converted_chat_history
@@ -181,9 +182,7 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
         ]
     )
 
-    default_response_synthesizer = prompt | llm.with_config(
-        callbacks=[HandlerToDocumentLog()])
-
+    default_response_synthesizer = prompt | llm
 
     # response_synthesizer = (
     #     default_response_synthesizer.configurable_alternatives(
@@ -244,20 +243,28 @@ def create_chain(llm: LanguageModelLike, retriever: BaseRetriever) -> Runnable:
 
 # Timeout 5 minutes in milliseconds
 
-def chat(*, question: str, llm_model : str = DEFAULT_MODEL, chat_history=None ):
+def chat(*, question: str, llm_model: str = DEFAULT_MODEL, chat_history=None):
 
     logger = logging.getLogger(__name__)
+    langfuse_handler = CallbackHandler(
+        secret_key="sk-lf-5f0a5cde-9332-41ab-8817-cc290490fa0d",
+        public_key="pk-lf-b57a1025-d936-438c-8c45-00906b2fb185",
+        host="http://localhost:3001",
+    )
+
     available_models = get_models()
     if available_models is None:
         logger.error("No LLM models available")
         raise Exception("No models available")
     if llm_model not in available_models:
-        logger.warn(f"Model {llm_model} not available, switching to default model {DEFAULT_MODEL}")
+        logger.warn(f"Model {llm_model} not available, switching to default model {
+                    DEFAULT_MODEL}")
         llm_model = DEFAULT_MODEL
         if llm_model not in available_models:
-            logger.error(f"Default model {DEFAULT_MODEL} not in available models {available_models}!")
+            logger.error(f"Default model {DEFAULT_MODEL} not in available models {
+                         available_models}!")
             return None
-    
+
     timeout = 1000 * 60 * 5
     llm = Ollama(model=llm_model, base_url=OLLAMA_BASE_URL, timeout=timeout)
 
@@ -266,5 +273,5 @@ def chat(*, question: str, llm_model : str = DEFAULT_MODEL, chat_history=None ):
     answer_chain = create_chain(llm, retriever)
 
     answer = answer_chain.invoke(
-        {"chat_history": None, "question": question})
+        {"chat_history": None, "question": question}, config={"callbacks": [langfuse_handler]})
     return answer

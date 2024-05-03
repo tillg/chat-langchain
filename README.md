@@ -12,18 +12,26 @@ From there I modified it (and plan to modify it) in the following ways:
 * Offering different sources: Another website (maybe a manual of another software), a Wiki space...
 * Providing functionality to evaluate performance, i.e. if the answers are close to what we expect.
 
-
 ## Dev Setup & Running
 
 I use a couple of windows with a standard command (this all assumes you are in the project folder):
 
 ```bash
+# Run the langfuse stack
+docker-compose up
+
 # Follow the Ollama log
 less +F ~/.ollama/logs/server.log
 
 # Run the server: Go into the project (root) directory
+source .venv/bin/activate
 python main.py
 ```
+
+Once this runs locally, you get the following web-urls:
+* [Local langfuse](http://localhost:3001)
+* [Local API documentation](http://localhost:8080/docs)
+
 ## Todo / backlog
 
 * Find out ifthe `_scripts` directory is needed.
@@ -32,6 +40,7 @@ python main.py
 
 ## Done
 
+* 2024-05-01 Serve new `chat` API
 * 2024-04-29 Decision is taken to rework the backend API. Think API first!
 * 2024-04-28 Added logging
 * 2024-04-25 Renamed Github Repo
@@ -51,3 +60,7 @@ python main.py
 8. Run the frontend with `yarn dev` for frontend.
 9. Open [localhost:3000](http://localhost:3000) in your browser.
 
+
+## Problems & Reading
+* Interesting: [The React library for LLMs.](https://github.com/llm-ui-kit/llm-ui). It also provides everything for streaming...
+* [Add Langfuse to your Langchain application](https://langfuse.com/docs/integrations/langchain/tracing)
